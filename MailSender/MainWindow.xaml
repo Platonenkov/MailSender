@@ -7,7 +7,9 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:command="http://www.galasoft.ch/mvvmlight"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        xmlns:htmlEditor="clr-namespace:Smith.WPF.HtmlEditor;assembly=Smith.WPF.HtmlEditor"
+        xmlns:Editor="clr-namespace:WpfRichText.Ex.Controls;assembly=WpfRichText.Ex"
+        xmlns:classes="clr-namespace:MailSender.Classes"
+        xmlns:converters="clr-namespace:MailSender.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800"
         DataContext="{Binding Main,Source={StaticResource Locator}}"
@@ -19,57 +21,82 @@
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadRecipientsCommand}"/>
             <i:InvokeCommandAction Command="{Binding LoadSendersCommand}"/>
+            <i:InvokeCommandAction Command="{Binding LoadMessageCommand}"/>
         </i:EventTrigger>
 
     </i:Interaction.Triggers>
     <Grid>
-        <TabControl>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="0" >
             <TabItem Header="Получатели">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <DataGrid ItemsSource="{Binding Recipients.Recipients, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedRecipient}" IsReadOnly="True" HorizontalGridLinesBrush="{x:Null}" 
-                              AlternatingRowBackground="CornflowerBlue" AutoGenerateColumns="False">
+                    <DataGrid ItemsSource="{Binding Recipients.Recipients, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedRecipient}" IsReadOnly="True"
+                              HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="CornflowerBlue" AutoGenerateColumns="False" 
+                              HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Id" Width="50" Binding="{Binding Id}"/>
-                            <DataGridTextColumn Header="Имя" Width="*" Binding="{Binding Name}"/>
-                            <DataGridTextColumn Header="Адрес" Width="*" Binding="{Binding Address}"/>
-                            <DataGridTextColumn Header="Was Sent" Width="60" Binding="{Binding WasSent}"/>
-                            <DataGridTextColumn Header="Send Date Time" Width="100" Binding="{Binding SendDateTime}"/>
+                            <DataGridTextColumn Header="Id" Width="50" Binding="{Binding Id, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Имя" Width="*" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Должность" Width="*" Binding="{Binding Position, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Компания" Width="*" Binding="{Binding Company, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Деятельность" Width="*" Binding="{Binding Occupation, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="INN" Width="*" Binding="{Binding INN, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Телефон" Width="*" Binding="{Binding Phone, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Адрес" Width="*" Binding="{Binding Address, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Статус" Width="*" Binding="{Binding WasSent, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Дата отправки" Width="*" Binding="{Binding SendDateTime, UpdateSourceTrigger=PropertyChanged}"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Grid Grid.Column="1"  DataContext="{Binding SelectedRecipient}">
+                    <Grid Grid.Column="1"  DataContext="{Binding SelectedRecipient, UpdateSourceTrigger=PropertyChanged}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0">
-                        <GroupBox Header="ID">
-                            <TextBlock Text="{Binding Id}" VerticalAlignment="Top"/>
-                        </GroupBox>
-                        <GroupBox Header="Name">
-                            <TextBox Text="{Binding Name}" VerticalAlignment="Top"/>
-                        </GroupBox>
-                        <GroupBox Header="Address">
-                            <TextBox Text="{Binding Address}" VerticalAlignment="Top"/>
-                        </GroupBox>
-                        <GroupBox Header="Статус">
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding WasSent}"/>
-                                <TextBlock Text="Отправлено" Margin="5,0"/>
-                            </StackPanel>
-                        </GroupBox>
+                            <GroupBox Header="ID">
+                                <TextBlock Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
+                            </GroupBox>
+                            <GroupBox Header="Name">
+                                <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
+                            </GroupBox>
+                            <GroupBox Header="Position">
+                                <TextBox Text="{Binding Position, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
+                            </GroupBox>
+                            <GroupBox Header="Company">
+                                <TextBox Text="{Binding Company, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
+                            </GroupBox>
+                            <GroupBox Header="Occupation">
+                                <TextBox Text="{Binding Occupation, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
+                            </GroupBox>
+                            <GroupBox Header="INN">
+                                <TextBox Text="{Binding INN, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
+                            </GroupBox>
+                            <GroupBox Header="Phone">
+                                <TextBox Text="{Binding Phone, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
+                            </GroupBox>
+                            <GroupBox Header="Address">
+                                <TextBox Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
+                            </GroupBox>
+                            <GroupBox Header="Статус">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding WasSent, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="Отправлено" Margin="5,0"/>
+                                </StackPanel>
+                            </GroupBox>
                         </StackPanel>
                         <StackPanel Grid.Row="1">
                             <Button Content="Add new" Margin="10" Command="{Binding Main.AddNewRecipientCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
                             <Button Content="Save"  Margin="10" Command="{Binding Main.SaveRecipientCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
                             <Button Content="Delete"  Margin="10" Command="{Binding Main.DeleteRecipientCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
                         </StackPanel>
-
-</Grid>
+                    </Grid>
                 </Grid>
             </TabItem>
             <TabItem Header="Отправители">
@@ -81,23 +108,23 @@
                     <DataGrid ItemsSource="{Binding Senders.Senders, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedSender}" IsReadOnly="True" HorizontalGridLinesBrush="{x:Null}"
                               AlternatingRowBackground="CornflowerBlue" AutoGenerateColumns="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Id" MinWidth="30" Binding="{Binding Id}"/>
-                            <DataGridTextColumn Header="Имя" MinWidth="30" Binding="{Binding Name}"/>
-                            <DataGridTextColumn Header="Адрес" MinWidth="100" Binding="{Binding Address}"/>
-                            <DataGridTextColumn Header="Smtp Server" Width="*" Binding="{Binding SmtpServer}"/>
-                            <DataGridTextColumn Header="Enable Ssl" Width="*" Binding="{Binding EnableSsl}"/>
-                            <DataGridTextColumn Header="Port" Width="*" Binding="{Binding Port}"/>
-                            <DataGridTextColumn Header="Password" Width="*" Binding="{Binding Password}"/>
-                            <DataGridTextColumn Header="Count Per 24 Hours" Width="*" Binding="{Binding CountPer24Hours}"/>
-                            <DataGridTextColumn Header="First In Day" Width="*" Binding="{Binding FirstInDay}"/>
+                            <DataGridTextColumn Header="Id" MinWidth="30" Binding="{Binding Id, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Имя" MinWidth="30" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Адрес" MinWidth="100" Binding="{Binding Address, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Smtp Server" Width="*" Binding="{Binding SmtpServer, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Enable Ssl" Width="*" Binding="{Binding EnableSsl, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Port" Width="*" Binding="{Binding Port, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Password" Width="*" Binding="{Binding Password, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Count Per 24 Hours" Width="*" Binding="{Binding CountPer24Hours, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="First In Day" Width="*" Binding="{Binding FirstInDay, UpdateSourceTrigger=PropertyChanged}"/>
                         </DataGrid.Columns>
                     </DataGrid>
 
-                    <Grid Grid.Column="1" DataContext="{Binding SelectedSender}">
-                       <Grid.RowDefinitions>
-                           <RowDefinition Height="*"/>
-                           <RowDefinition Height="Auto"/>
-                       </Grid.RowDefinitions>
+                    <Grid Grid.Column="1" DataContext="{Binding SelectedSender, UpdateSourceTrigger=PropertyChanged}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
                         <StackPanel Grid.Row="0" >
                             <GroupBox Header="ID">
                                 <TextBlock Text="{Binding Id}" VerticalAlignment="Top"/>
@@ -130,45 +157,83 @@
                                 <xctk:TimePicker Value="{Binding FirstInDay}" IsEnabled="False"/>
                             </GroupBox>
                         </StackPanel>
-                        <StackPanel Grid.Row="1"> 
-                           <StackPanel VerticalAlignment="Bottom">
-                               <Button Content="Add new" Margin="10" Command="{Binding Main.AddNewSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
-                               <Button Content="Save"  Margin="10" Command="{Binding Main.SaveSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
-                               <Button Content="Delete"  Margin="10" Command="{Binding Main.DeleteSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
-                           </StackPanel>
-                       </StackPanel>
+                        <StackPanel Grid.Row="1">
+                            <StackPanel VerticalAlignment="Bottom">
+                                <Button Content="Add new" Margin="10" Command="{Binding Main.AddNewSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
+                                <Button Content="Save"  Margin="10" Command="{Binding Main.SaveSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
+                                <Button Content="Delete"  Margin="10" Command="{Binding Main.DeleteSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
+                            </StackPanel>
+                        </StackPanel>
 
                     </Grid>
                 </Grid>
             </TabItem>
             <TabItem Header="Письмо">
-                <htmlEditor:HtmlEditor x:Name="Editor" />
-
-                <!--<Grid>
+                <StackPanel VerticalAlignment="Stretch" Orientation="Vertical">
+                    <xctk:RichTextBox  MinHeight="500" Text="{Binding TextMessage, UpdateSourceTrigger=PropertyChanged}">
+                        <xctk:RichTextBoxFormatBarManager.FormatBar>
+                            <xctk:RichTextBoxFormatBar />
+                        </xctk:RichTextBoxFormatBarManager.FormatBar>
+                        <xctk:RichTextBox.TextFormatter>
+                            <xctk:XamlFormatter />
+                        </xctk:RichTextBox.TextFormatter>
+                    </xctk:RichTextBox>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Рассылка">
+                <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <StackPanel>
-                        <xctk:RichTextBox DataContext="{Binding Message, UpdateSourceTrigger=PropertyChanged}">
-                            <xctk:RichTextBoxFormatBarManager.FormatBar>
-                                <xctk:RichTextBoxFormatBar />
-                            </xctk:RichTextBoxFormatBarManager.FormatBar>
-                        </xctk:RichTextBox>
-                    </StackPanel>
-                    <StackPanel Grid.Row="1">
-                        <htmlEditor:HtmlEditor x:Name="Editor" />
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Row="0" Grid.Column="0" Content="Start" VerticalAlignment="Center" Margin="10" Command="{Binding StartCommand}"/>
+                    <Button Grid.Row="0" Grid.Column="1" Content="Stop" VerticalAlignment="Center" Margin="10"  Command="{Binding StopCommand}"/>
+                    <ComboBox Grid.Row="0" Grid.Column="2" VerticalAlignment="Center"  ItemsSource="{Binding Senders.Senders, UpdateSourceTrigger=PropertyChanged}"
+                          SelectedValue="{Binding SelectedSender}" IsEnabled="{Binding IsSenderWork, Converter={converters:BoolInverse}}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type classes:Sender}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
 
-                        --><!--<xctk:RichTextBox x:Name="_richTextBox" Margin="10" BorderBrush="Gray" Padding="10"
-                                          Text="{Binding Notes}" 
-                                          ScrollViewer.VerticalScrollBarVisibility="Auto">
-                            <xctk:RichTextBox.TextFormatter>
-                                <xctk:XamlFormatter />
-                            </xctk:RichTextBox.TextFormatter>
-                        </xctk:RichTextBox>--><!--
-                    </StackPanel>
-                </Grid>-->
+                                    <TextBlock Text=" | " />
+
+                                    <TextBlock Text="{Binding CountPer24Hours, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
             </TabItem>
         </TabControl>
+    <StatusBar Grid.Row="1">
+            <StatusBarItem>
+                <TextBlock>
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Value="True"
+                                             Binding="{Binding IsSenderWork}">
+                                    <Setter Property="Text" Value="Sending" />
+                                </DataTrigger>
+                                <DataTrigger Value="False"
+                                             Binding="{Binding IsSenderWork}">
+                                    <Setter Property="Text" Value="Not Sending" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+            </StatusBarItem>
+    </StatusBar>
     </Grid>
 </Window>

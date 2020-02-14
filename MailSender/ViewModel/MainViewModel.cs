@@ -1,9 +1,16 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Net.Mime;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Xml;
 using System.Xml.Serialization;
+using System.Xml.Xsl;
 using GalaSoft.MvvmLight;
 using MailSender.Classes;
 using MailSender.Command;
@@ -12,6 +19,16 @@ namespace MailSender.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
+        #region IsSenderWork : bool - Статус отправителя
+
+        /// <summary>Статус отправителя</summary>
+        private bool _IsSenderWork;
+
+        /// <summary>Статус отправителя</summary>
+        public bool IsSenderWork { get => _IsSenderWork; set => Set(ref _IsSenderWork, value); }
+
+        #endregion
+
         #region Senders : SenderList - Список отправителей
 
         /// <summary>Список отправителей</summary>
@@ -71,18 +88,81 @@ namespace MailSender.ViewModel
         public FlowDocument Message { get => _Message; set => Set(ref _Message, value); }
 
         #endregion
+        #region TextMessage : string - text
+
+        /// <summary>text</summary>
+        private string _TextMessage;
+
+        /// <summary>text</summary>
+        public string TextMessage
+        {
+            get => _TextMessage;
+            set
+            {
+                Set(ref _TextMessage, value);
+                _HtmlMessage = null;
+            }
+        }
+
+        #endregion
+        #region HtmlMessage : string - HTML сообщение
+
+        /// <summary>HTML сообщение</summary>
+        private string _HtmlMessage;
+
+        /// <summary>HTML сообщение</summary>
+        public string HtmlMessage
+        {
+            get
+            {
+                if (_HtmlMessage != null) return _HtmlMessage;
+
+                return _HtmlMessage = GetHtmlFromString(TextMessage);
+            }
+        }
+
+        private string GetHtmlFromString(string text)
+        {
+            //The text will be loaded here
+            string s2 = text;
+
+            //All blank spaces would be replaced for html subsitute of blank space(&nbsp;) 
+            s2 = s2.Replace(" ", "&nbsp;");
+
+            //Carriage return & newline replaced to <br/>
+            s2 = s2.Replace("\r\n", "<br/>");
+            string Str = "<html>";
+            Str += "<head>";
+            Str += "<title></title>";
+            Str += "</head>";
+            Str += "<body>";
+            Str += "<table border=0 width=95% cellpadding=0 cellspacing=0>";
+            Str += "<tr>";
+            Str += "<td>" + s2 + "</td>";
+            Str += "</tr>";
+            Str += "</table>";
+            Str += "</body>";
+            Str += "</html>";
+            return Str;
+        }
+        #endregion
 
         private static readonly string CurrentDirectory = Environment.CurrentDirectory;
         private static readonly string RecipientsFile = $"Data\\Recipients.info";
+        private static readonly string AttachFile = $"Data\\AttachFile.pdf";
         private static readonly string SendersFile = $"Data\\Senders.info";
         private static readonly string MessageFile = $"Data\\Message.info";
+        private static readonly string LogFile = $"Data\\Log.info";
         private readonly string RecipientsFilePath = Path.Combine(CurrentDirectory, RecipientsFile);
         private readonly string SendersFilePath = Path.Combine(CurrentDirectory, SendersFile);
-        private readonly string MessageFilePath = Path.Combine(CurrentDirectory, SendersFile);
+        private readonly string MessageFilePath = Path.Combine(CurrentDirectory, MessageFile);
+        private readonly string LogFilePath = Path.Combine(CurrentDirectory, LogFile);
+        private readonly string AttachFilePath = Path.Combine(CurrentDirectory, AttachFile);
 
 
         public MainViewModel()
         {
+            Message = new FlowDocument();
             Senders = new SendersList();
             Recipients = new RecipientsList();
             LoadRecipientsCommand = new LamdaCommand(LoadRecipientsFromFile, CanLoadRecipientsFile);
@@ -94,9 +174,78 @@ namespace MailSender.ViewModel
             AddNewRecipientCommand=new LamdaCommand(AddNewRecipientClick);
             SaveRecipientCommand = new GalaSoft.MvvmLight.Command.RelayCommand<Recipient>(SaveRecipientClick);
             DeleteRecipientCommand = new LamdaCommand(DeleteRecipientClick);
+            LoadMessageCommand = new LamdaCommand(ReadMessage);
+            StartCommand= new LamdaCommand(StartSendMessage);
+            StopCommand= new LamdaCommand(StopSendMessage);
         }
 
+        private void StopSendMessage(object Obj) { IsSenderWork = false; }
 
+        private void StartSendMessage(object Obj)
+        {
+            IsSenderWork = true;
+            SendMessageAsync();
+        }
+
+        private  TimeSpan Pause = new TimeSpan(0,0,2,0);
+        private async void SendMessageAsync()
+        {
+            foreach (var recipient in Recipients.Recipients.Where(r => r.WasSent == false))
+            {
+                if (SelectedSender.CountPer24Hours >= 500)
+                {
+                    IsSenderWork = false;
+                    return;
+                }
+                var result =  await CreateMessageAsync(recipient).ConfigureAwait(true);
+
+               if (result)
+               {
+                   recipient.WasSent = true;
+                   SelectedSender.CountPer24Hours += 1;
+               }
+               
+               await Task.Delay(Pause).ConfigureAwait(true);
+
+               if(!IsSenderWork)return;
+            }
+        }
+
+        public async Task<bool> CreateMessageAsync(Recipient recipient)
+        {
+            MailMessage msg = new MailMessage(SelectedSender.Address, recipient.Address) {Subject = "BuildRM, мы c Вами чтобы помогать.", Body = HtmlMessage};
+
+            if(File.Exists(AttachFilePath))msg.Attachments.Add(new Attachment(AttachFilePath));
+            msg.IsBodyHtml = true;
+            SmtpClient smtp = new SmtpClient(SelectedSender.SmtpServer, SelectedSender.Port)
+            {
+                Credentials = new NetworkCredential(SelectedSender.Address, SelectedSender.Password), EnableSsl = SelectedSender.EnableSsl
+            };
+
+            try
+            {
+               await smtp.SendMailAsync(msg).ConfigureAwait(true);
+               return true;
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    if(!File.Exists(LogFilePath)) using (var writer = new FileStream(LogFilePath, FileMode.Create)) { }
+
+                    using (StreamWriter sw = File.AppendText(LogFilePath))
+                    {
+                        sw.WriteLine("Exception caught in CreateTimeoutTestMessage(): {0}",
+                            e.ToString());
+                    }
+                }
+                catch (Exception exception)
+                {
+                }
+
+                return false;
+            }
+        }
         #region Commands
 
         public ICommand WindowClosingCommand { get; }
@@ -108,6 +257,9 @@ namespace MailSender.ViewModel
         public ICommand AddNewRecipientCommand { get; }
         public ICommand SaveRecipientCommand { get; }
         public ICommand DeleteRecipientCommand { get; }
+        public ICommand LoadMessageCommand { get; }
+        public ICommand StartCommand { get ; }
+        public ICommand StopCommand { get ; }
 
         #region Recipients
 
@@ -122,7 +274,7 @@ namespace MailSender.ViewModel
             var data = recipient ?? SelectedRecipient;
             if (data is null) return;
             if(Recipients.Recipients.Contains(data))return;
-            if(data.Name.IsNullOrWhiteSpace()&& data.Address.IsNullOrWhiteSpace()) return;
+            if(data.Name.IsNullOrWhiteSpace() && data.Address.IsNullOrWhiteSpace()) return;
 
             Recipients.Add(data);
 
@@ -171,13 +323,20 @@ namespace MailSender.ViewModel
 
         private void SaveMessage()
         {
-            using (var stream = new FileStream(MessageFilePath, FileMode.Create))
+            using (StreamWriter sw = new StreamWriter(MessageFilePath))
             {
-                var XML = new XmlSerializer(typeof(FlowDocument));
-                XML.Serialize(stream, Message);
+                sw.WriteLine(TextMessage);
             }
-
         }
+        private void ReadMessage(object Obj)
+        {
+            if (!File.Exists(MessageFilePath)) return;
+            using (StreamReader sr = new StreamReader(MessageFilePath))
+            {
+                TextMessage = sr.ReadToEnd();
+            }
+        }
+
         private bool CanLoadSendersFile(object Arg)
         {
             var filePath = SendersFilePath;

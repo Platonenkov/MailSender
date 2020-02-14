@@ -70,6 +70,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WpfRichText.Ex">
+      <HintPath>bibliotecs\WpfRichText.Ex.dll</HintPath>
+    </Reference>
     <Reference Include="Xceed.Wpf.AvalonDock, Version=3.8.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Extended.Wpf.Toolkit.3.8.1\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
     </Reference>
@@ -96,6 +99,9 @@
     <Compile Include="Classes\Sender.cs" />
     <Compile Include="Classes\SendersList.cs" />
     <Compile Include="Command\LamdaCommand.cs" />
+    <Compile Include="Converters\BoolInverse.cs" />
+    <Compile Include="Converters\FlowDocumentConverter.cs" />
+    <Compile Include="Converters\ValueConverter.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="MainWindow.xaml">
