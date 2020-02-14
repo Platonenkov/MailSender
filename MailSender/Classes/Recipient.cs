@@ -6,7 +6,7 @@ namespace MailSender.Classes
     /// получатель писем
     /// </summary>
     [Serializable]
-    public class Recipient
+    public class Recipient : MathCore.ViewModels.ViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -25,11 +25,20 @@ namespace MailSender.Classes
             get => _WasSent;
             set
             {
-                _WasSent = value;
+                Set(ref _WasSent, value);
                 if(value) SendDateTime = DateTime.Now;
+                if(!value) SendDateTime = null;
             }
         }
 
-        public DateTime? SendDateTime { get; set; }
+        #region SendDateTime : DateTime? - Дата отправки
+
+        /// <summary>Дата отправки</summary>
+        private DateTime? _SendDateTime;
+
+        /// <summary>Дата отправки</summary>
+        public DateTime? SendDateTime { get => _SendDateTime; set => Set(ref _SendDateTime, value); }
+
+        #endregion
     }
 }

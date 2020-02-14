@@ -19,6 +19,15 @@ namespace MailSender.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
+        #region Title : string - Title window
+
+        /// <summary>Title window</summary>
+        private string _Title ="SmapTool";
+
+        /// <summary>Title window</summary>
+        public string Title { get => _Title; set => Set(ref _Title, value); }
+
+        #endregion
         #region IsSenderWork : bool - Статус отправителя
 
         /// <summary>Статус отправителя</summary>
@@ -79,74 +88,15 @@ namespace MailSender.ViewModel
         #endregion
 
 
-        #region Message : FlowDocument - Текст сообщения
+        #region MyHtmlProperty : string - текст редактора
 
-        /// <summary>Текст сообщения</summary>
-        private FlowDocument _Message;
+        /// <summary>текст редактора</summary>
+        private string _MyHtmlProperty;
 
-        /// <summary>Текст сообщения</summary>
-        public FlowDocument Message { get => _Message; set => Set(ref _Message, value); }
-
-        #endregion
-        #region TextMessage : string - text
-
-        /// <summary>text</summary>
-        private string _TextMessage;
-
-        /// <summary>text</summary>
-        public string TextMessage
-        {
-            get => _TextMessage;
-            set
-            {
-                Set(ref _TextMessage, value);
-                _HtmlMessage = null;
-            }
-        }
+        /// <summary>текст редактора</summary>
+        public string MyHtmlProperty { get => _MyHtmlProperty; set => Set(ref _MyHtmlProperty, value); }
 
         #endregion
-        #region HtmlMessage : string - HTML сообщение
-
-        /// <summary>HTML сообщение</summary>
-        private string _HtmlMessage;
-
-        /// <summary>HTML сообщение</summary>
-        public string HtmlMessage
-        {
-            get
-            {
-                if (_HtmlMessage != null) return _HtmlMessage;
-
-                return _HtmlMessage = GetHtmlFromString(TextMessage);
-            }
-        }
-
-        private string GetHtmlFromString(string text)
-        {
-            //The text will be loaded here
-            string s2 = text;
-
-            //All blank spaces would be replaced for html subsitute of blank space(&nbsp;) 
-            s2 = s2.Replace(" ", "&nbsp;");
-
-            //Carriage return & newline replaced to <br/>
-            s2 = s2.Replace("\r\n", "<br/>");
-            string Str = "<html>";
-            Str += "<head>";
-            Str += "<title></title>";
-            Str += "</head>";
-            Str += "<body>";
-            Str += "<table border=0 width=95% cellpadding=0 cellspacing=0>";
-            Str += "<tr>";
-            Str += "<td>" + s2 + "</td>";
-            Str += "</tr>";
-            Str += "</table>";
-            Str += "</body>";
-            Str += "</html>";
-            return Str;
-        }
-        #endregion
-
         private static readonly string CurrentDirectory = Environment.CurrentDirectory;
         private static readonly string RecipientsFile = $"Data\\Recipients.info";
         private static readonly string AttachFile = $"Data\\AttachFile.pdf";
@@ -162,7 +112,8 @@ namespace MailSender.ViewModel
 
         public MainViewModel()
         {
-            Message = new FlowDocument();
+            MyHtmlProperty = String.Empty;
+            
             Senders = new SendersList();
             Recipients = new RecipientsList();
             LoadRecipientsCommand = new LamdaCommand(LoadRecipientsFromFile, CanLoadRecipientsFile);
@@ -215,7 +166,7 @@ namespace MailSender.ViewModel
 
         public async Task<bool> CreateMessageAsync(Recipient recipient)
         {
-            MailMessage msg = new MailMessage(SelectedSender.Address, recipient.Address) {Subject = "BuildRM, мы c Вами чтобы помогать.", Body = HtmlMessage};
+            MailMessage msg = new MailMessage(SelectedSender.Address, recipient.Address) {Subject = "BuildRM, мы c Вами чтобы помогать.", Body = MyHtmlProperty };
 
             if(File.Exists(AttachFilePath))msg.Attachments.Add(new Attachment(AttachFilePath));
             msg.IsBodyHtml = true;
@@ -264,6 +215,7 @@ namespace MailSender.ViewModel
         public ICommand StopCommand { get ; }
 
         #region Recipients
+
 
         private void DeleteRecipientClick(object Obj)
         {
@@ -327,7 +279,7 @@ namespace MailSender.ViewModel
         {
             using (StreamWriter sw = new StreamWriter(MessageFilePath))
             {
-                sw.WriteLine(TextMessage);
+                sw.WriteLine(MyHtmlProperty);
             }
         }
         private void ReadMessage(object Obj)
@@ -335,7 +287,7 @@ namespace MailSender.ViewModel
             if (!File.Exists(MessageFilePath)) return;
             using (StreamReader sr = new StreamReader(MessageFilePath))
             {
-                TextMessage = sr.ReadToEnd();
+                MyHtmlProperty = sr.ReadToEnd();
             }
         }
 

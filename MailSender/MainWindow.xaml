@@ -7,13 +7,14 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:command="http://www.galasoft.ch/mvvmlight"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        xmlns:Editor="clr-namespace:WpfRichText.Ex.Controls;assembly=WpfRichText.Ex"
         xmlns:classes="clr-namespace:MailSender.Classes"
         xmlns:converters="clr-namespace:MailSender.Converters"
+        xmlns:htmlEditor="clr-namespace:Smith.WPF.HtmlEditor;assembly=Smith.WPF.HtmlEditor"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800"
+        Title="{Binding Title}" Height="600" Width="800"
         DataContext="{Binding Main,Source={StaticResource Locator}}"
-        ResizeMode="CanResize">
+        ResizeMode="CanResize"
+        >
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <command:EventToCommand Command="{Binding WindowClosingCommand}" PassEventArgsToCommand="True" />
@@ -106,7 +107,7 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <DataGrid ItemsSource="{Binding Senders.Senders, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedSender}" IsReadOnly="True" HorizontalGridLinesBrush="{x:Null}"
-                              AlternatingRowBackground="CornflowerBlue" AutoGenerateColumns="False">
+                              AlternatingRowBackground="CornflowerBlue" AutoGenerateColumns="False" >
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Id" MinWidth="30" Binding="{Binding Id, UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="Имя" MinWidth="30" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
@@ -130,31 +131,31 @@
                                 <TextBlock Text="{Binding Id}" VerticalAlignment="Top"/>
                             </GroupBox>
                             <GroupBox Header="Name">
-                                <TextBox Text="{Binding Name}" VerticalAlignment="Top"/>
+                                <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                             </GroupBox>
                             <GroupBox Header="Address">
-                                <TextBox Text="{Binding Address}" VerticalAlignment="Top"/>
+                                <TextBox Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                             </GroupBox>
                             <GroupBox Header="SmtpServer">
-                                <TextBox Text="{Binding SmtpServer}" VerticalAlignment="Top"/>
+                                <TextBox Text="{Binding SmtpServer, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                             </GroupBox>
                             <GroupBox Header="Port">
-                                <xctk:IntegerUpDown Value="{Binding Port}" Minimum="0" Width="100" HorizontalAlignment="Left"/>
+                                <xctk:IntegerUpDown Value="{Binding Port, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Width="100" HorizontalAlignment="Left"/>
                             </GroupBox>
                             <GroupBox Header="Password">
-                                <TextBox Text="{Binding Password}" VerticalAlignment="Top"/>
+                                <TextBox Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" />
                             </GroupBox>
                             <GroupBox Header="Count per 24 hours">
-                                <TextBlock Text="{Binding CountPer24Hours}" VerticalAlignment="Top" Width="50" HorizontalAlignment="Left"/>
+                                <TextBlock Text="{Binding CountPer24Hours, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="50" HorizontalAlignment="Left"/>
                             </GroupBox>
                             <GroupBox Header="EnableSSL">
                                 <StackPanel Orientation="Horizontal">
-                                    <CheckBox IsChecked="{Binding EnableSsl}"/>
+                                    <CheckBox IsChecked="{Binding EnableSsl, UpdateSourceTrigger=PropertyChanged}"/>
                                     <TextBlock Text="Включить SSL" Margin="5,0"/>
                                 </StackPanel>
                             </GroupBox>
                             <GroupBox Header="Time, when was sent first in day">
-                                <xctk:TimePicker Value="{Binding FirstInDay}" IsEnabled="False"/>
+                                <xctk:TimePicker Value="{Binding FirstInDay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"/>
                             </GroupBox>
                         </StackPanel>
                         <StackPanel Grid.Row="1">
@@ -169,15 +170,18 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Письмо">
-                <StackPanel VerticalAlignment="Stretch" Orientation="Vertical">
-                    <xctk:RichTextBox  MinHeight="500" Text="{Binding TextMessage, UpdateSourceTrigger=PropertyChanged}">
+                <StackPanel>
+                    <htmlEditor:HtmlEditor BindingContent="{Binding MyHtmlProperty, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+
+                    </htmlEditor:HtmlEditor>
+                        <!--<xctk:RichTextBox  MinHeight="500" Text="{Binding TextMessage, UpdateSourceTrigger=PropertyChanged}">
                         <xctk:RichTextBoxFormatBarManager.FormatBar>
                             <xctk:RichTextBoxFormatBar />
                         </xctk:RichTextBoxFormatBarManager.FormatBar>
                         <xctk:RichTextBox.TextFormatter>
                             <xctk:XamlFormatter />
                         </xctk:RichTextBox.TextFormatter>
-                    </xctk:RichTextBox>
+                    </xctk:RichTextBox>-->
                 </StackPanel>
             </TabItem>
             <TabItem Header="Рассылка">
