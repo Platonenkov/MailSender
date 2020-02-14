@@ -190,6 +190,8 @@ namespace MailSender.ViewModel
         private  TimeSpan Pause = new TimeSpan(0,0,2,0);
         private async void SendMessageAsync()
         {
+            if(SelectedSender is null) return;
+
             foreach (var recipient in Recipients.Recipients.Where(r => r.WasSent == false))
             {
                 if (SelectedSender.CountPer24Hours >= 500)
