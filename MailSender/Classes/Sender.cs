@@ -76,19 +76,45 @@ namespace MailSender.Classes
                 {
                     var time = DateTime.Now - FirstInDay.Value;
                     if(time < TimeSpan.FromHours(24)) return _CountPer24Hours;
-                    else _CountPer24Hours = 0;
+                    else
+                    {
+                        _CountPer24Hours = 0;
+                        FirstInDay = null;
+                    }
                 }
                 return _CountPer24Hours;
             }
             set
             {
                 Set(ref _CountPer24Hours, value);
-                if(value == 1) FirstInDay = DateTime.Now;
+                TotalSent++;
+                var time = DateTime.Now;
+                LastSend = time;
+                if(value == 1) FirstInDay = time;
             }
         }
 
         #region FirstInDay : DateTime? - Первый за день
 
+
+        #region TotalSent : long - Всего отправлено
+
+        /// <summary>Всего отправлено</summary>
+        private long _TotalSent;
+
+        /// <summary>Всего отправлено</summary>
+        public long TotalSent { get => _TotalSent; set => Set(ref _TotalSent, value); }
+
+        #endregion
+        #region LastSend : DateTime? - Дата последней отправки
+
+        /// <summary>Дата последней отправки</summary>
+        private DateTime? _LastSend;
+
+        /// <summary>Дата последней отправки</summary>
+        public DateTime? LastSend { get => _LastSend; set => Set(ref _LastSend, value); }
+
+        #endregion
         /// <summary>Первый за день</summary>
         private DateTime? _FirstInDay;
 

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -109,21 +110,62 @@ namespace MailSender.ViewModel
 
         #endregion
         private static readonly string CurrentDirectory = Environment.CurrentDirectory;
-        private static readonly string RecipientsFile = $"Data\\Recipients.info";
-        private static readonly string AttachFile = $"Data\\AttachFile.pdf";
-        private static readonly string SendersFile = $"Data\\Senders.info";
-        private static readonly string MessageFile = $"Data\\Message.info";
-        private static readonly string LogFile = $"Data\\Log.txt";
-        private readonly string RecipientsFilePath = Path.Combine(CurrentDirectory, RecipientsFile);
-        private readonly string SendersFilePath = Path.Combine(CurrentDirectory, SendersFile);
-        private readonly string MessageFilePath = Path.Combine(CurrentDirectory, MessageFile);
-        private readonly string LogFilePath = Path.Combine(CurrentDirectory, LogFile);
-        private readonly string AttachFilePath = Path.Combine(CurrentDirectory, AttachFile);
+        private static readonly string DataDirectory =Path.Combine(CurrentDirectory,$"Data");
+        private static readonly string LogDirectory = Path.Combine(CurrentDirectory, $"Logs");
+
+        private static readonly string LogFileName = $"Log.txt";
+        private static readonly string RecipientsFile = $"Recipients.info";
+        private static readonly string AttachFileName = $"AttachFileName.pdf";
+        private static readonly string SendersFileName = $"Senders.info";
+        private static readonly string MessageFileName = $"Message.info";
+
+        private readonly string RecipientsFilePath = Path.Combine(CurrentDirectory, DataDirectory,RecipientsFile);
+        private readonly string SendersFilePath = Path.Combine(CurrentDirectory, DataDirectory, SendersFileName);
+        private readonly string MessageFilePath = Path.Combine(CurrentDirectory, DataDirectory, MessageFileName);
+        private readonly string LogFilePath = Path.Combine(CurrentDirectory, LogDirectory, LogFileName);
+        private readonly string AttachFilePath = Path.Combine(CurrentDirectory, DataDirectory, AttachFileName);
 
 
+        private void CheckWorkDirectoryOrCreate()
+        {
+            if (!Directory.Exists(LogDirectory))
+                try
+                {
+                    Directory.CreateDirectory(LogDirectory);
+                }
+                catch (Exception e)
+                {
+                    notificationManager.Show(null, $"Can't may create Logs Directory", NotificationType.Error);
+                }
+            if (!Directory.Exists(DataDirectory))
+                try
+                {
+                    Directory.CreateDirectory(DataDirectory);
+                }
+                catch (Exception e)
+                {
+                    notificationManager.Show(null, $"Can't may create Data Directory", NotificationType.Error);
+                }
+        }
+
+        private void CheckLogsOrMove()
+        {
+            if (File.Exists(LogFilePath))
+            {
+                var log = new FileInfo(LogFilePath);
+                var newName = $"{DateTime.Now.ToString(CultureInfo.CurrentCulture)} Log";
+                newName = newName.Replace(".", String.Empty).Replace(":",String.Empty).Replace("\\",String.Empty).Replace("/",String.Empty);
+                    
+                log.MoveTo(Path.Combine(LogDirectory,newName));
+            }
+        }
         public MainViewModel()
         {
             Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
+            
+            CheckWorkDirectoryOrCreate();
+            CheckLogsOrMove();
+
             MyHtmlProperty = String.Empty;
             
             Senders = new SendersList();
@@ -150,7 +192,25 @@ namespace MailSender.ViewModel
             SendMessageAsync();
         }
 
-        private  TimeSpan Pause = new TimeSpan(0,0,2,0);
+        #region Pause : TimeSpan - Пауза между отправками
+
+        /// <summary>Пауза между отправками</summary>
+        private TimeSpan _Pause = new TimeSpan(0, 0, 2, 0);
+
+        /// <summary>Пауза между отправками</summary>
+        public TimeSpan Pause { get => _Pause; set => Set(ref _Pause, value); }
+
+        #endregion
+
+        #region MaxMailPer24Hour : int - Максимальное число в 24 часа
+
+        /// <summary>Максимальное число в 24 часа</summary>
+        private int _MaxMailPer24Hour = 500;
+
+        /// <summary>Максимальное число в 24 часа</summary>
+        public int MaxMailPer24Hour { get => _MaxMailPer24Hour; set => Set(ref _MaxMailPer24Hour, value); }
+
+        #endregion
         private async void SendMessageAsync()
         {
             if(SelectedSender is null) return;
@@ -158,9 +218,10 @@ namespace MailSender.ViewModel
             foreach (var recipient in Recipients.Recipients.Where(r => r.WasSent == false))
             {
                 if(recipient.Address.IsNullOrWhiteSpace())continue;
-                if (SelectedSender.CountPer24Hours >= 500)
+                if (SelectedSender.CountPer24Hours >= MaxMailPer24Hour)
                 {
                     IsSenderWork = false;
+                    notificationManager.Show("Info", "Limit of sending messages!!", NotificationType.Notification);
                     return;
                 }
                 var result =  await CreateMessageAsync(recipient).ConfigureAwait(true);
@@ -175,6 +236,9 @@ namespace MailSender.ViewModel
 
                if(!IsSenderWork)return;
             }
+            notificationManager.Show("Info", "Nothing to send", NotificationType.Notification);
+
+            IsSenderWork = false;
         }
 
         public async Task<bool> CreateMessageAsync(Recipient recipient)
