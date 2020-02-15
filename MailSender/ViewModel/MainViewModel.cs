@@ -26,7 +26,35 @@ namespace MailSender.ViewModel
 
         #region Поиск
 
+        #region FindByName : bool - Поиск по имени
 
+        /// <summary>Поиск по имени</summary>
+        private bool _FindByName;
+
+        /// <summary>Поиск по имени</summary>
+        public bool FindByName { get => _FindByName; set => Set(ref _FindByName, value); }
+
+        #endregion
+
+        #region FindByAddress : bool - поиск по адресу
+
+        /// <summary>поиск по адресу</summary>
+        private bool _FindByAddress;
+
+        /// <summary>поиск по адресу</summary>
+        public bool FindByAddress { get => _FindByAddress; set => Set(ref _FindByAddress, value); }
+
+        #endregion
+
+        #region FindById : bool - поиск по id
+
+        /// <summary>поиск по id</summary>
+        private bool _FindById;
+
+        /// <summary>поиск по id</summary>
+        public bool FindById { get => _FindById; set => Set(ref _FindById, value); }
+
+        #endregion
         private string _FindeString = string.Empty;
         public string FindeString
         {
@@ -54,7 +82,7 @@ namespace MailSender.ViewModel
                 var find = new ObservableCollection<Recipient>();
                 foreach (var recipient in Recipients.Recipients)
                 {
-                    if(recipient.Name.IsNotNullOrWhiteSpace())
+                    if(FindByName && recipient.Name.IsNotNullOrWhiteSpace())
                     {
                         if (Regular.FindString(FindeString.ToLower(), recipient.Name.ToLower()))
                         {
@@ -63,10 +91,15 @@ namespace MailSender.ViewModel
 
                         }
                     }         
-                    if(recipient.Address.IsNotNullOrWhiteSpace())
-                        if (Regular.FindString(FindeString.ToLower(), recipient.Address.ToLower())) find.Add(recipient);
+                    if(FindByAddress && recipient.Address.IsNotNullOrWhiteSpace())
+                        if (Regular.FindString(FindeString.ToLower(), recipient.Address.ToLower()))
+                        {
+                            find.Add(recipient);
+                            continue;
 
-
+                        }
+                    if (FindById)
+                        if (Regular.FindString(FindeString.ToLower(), recipient.Id.ToString())) find.Add(recipient);
                 }
                 if (find.Count == 0 || FindeString == string.Empty) { FindeRec = Recipients.Recipients; }
                 else FindeRec = find;
@@ -231,8 +264,10 @@ namespace MailSender.ViewModel
         }
         public MainViewModel()
         {
+
             Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
-            
+            FindByName = true;
+            FindByAddress = true;
             CheckWorkDirectoryOrCreate();
             CheckLogsOrMove();
             MyHtmlProperty = String.Empty;

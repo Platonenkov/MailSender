@@ -30,7 +30,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="20"/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
         <TabControl Grid.Row="0" >
             <TabItem Header="Получатели">
@@ -40,18 +40,19 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="45"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <StackPanel>
-                        <DockPanel  Margin="5,5" Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" Height="30">
-                            <TextBlock>Поиск : </TextBlock>
+                    <StackPanel Grid.Column="0" Grid.Row="0">
+                        <StackPanel Orientation="Horizontal"  Margin="5,2">
+                            <TextBlock >Поиск : </TextBlock>
                             <TextBox Text="{Binding FindeString, UpdateSourceTrigger=PropertyChanged}"/>
-                        </DockPanel>
-                        <DockPanel>
-                            <CheckBox Content="Поиск по имени"/>
-                            <CheckBox Content="Поиск по адресу"/>
-                        </DockPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="5,2">
+                            <CheckBox Content="Поиск по имени" IsChecked="{Binding FindByName}"/>
+                            <CheckBox Content="Поиск по адресу" IsChecked="{Binding FindByAddress}"/>
+                            <CheckBox Content="Поиск по id" IsChecked="{Binding FindById}"/>
+                        </StackPanel>
                     </StackPanel>
                     <DataGrid Grid.Row="1" Grid.Column="0" ItemsSource="{Binding FindeRec, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedRecipient}" IsReadOnly="True"
                               HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="CornflowerBlue" AutoGenerateColumns="False" 
@@ -257,10 +258,30 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Row="0" Grid.Column="0" Content="Start" VerticalAlignment="Center" Margin="10" Command="{Binding StartCommand}"/>
-                    <Button Grid.Row="0" Grid.Column="1" Content="Stop" VerticalAlignment="Center" Margin="10"  Command="{Binding StopCommand}"/>
+                    <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <StackPanel.Resources>
+                            <Style TargetType="Button">
+                                <Setter Property="Height" Value="30"/>
+                                <Setter Property="Width" Value="30"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                            </Style>
+                        </StackPanel.Resources>
+                        <Button VerticalAlignment="Center" Margin="10" Command="{Binding StartCommand}" IsEnabled="{Binding IsSenderWork, Converter={converters:BoolInverse}}">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Play" Width="20" Height="20"  Foreground="Black" />
+                            </StackPanel>
+                        </Button>
+                        <Button VerticalAlignment="Center" Margin="10"  Command="{Binding StopCommand}" IsEnabled="{Binding IsSenderWork}">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Stop" Width="20" Height="20"  Foreground="Black" />
+                            </StackPanel>
+                        </Button>
+
+                    </StackPanel>
+
                     <ComboBox Grid.Row="0" Grid.Column="2" VerticalAlignment="Center"  ItemsSource="{Binding Senders.Senders, UpdateSourceTrigger=PropertyChanged}"
-                          SelectedValue="{Binding SelectedSender}" IsEnabled="{Binding IsSenderWork, Converter={converters:BoolInverse}}">
+                              SelectedValue="{Binding SelectedSender}" IsEnabled="{Binding IsSenderWork, Converter={converters:BoolInverse}}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type classes:Sender}">
                                 <StackPanel Orientation="Horizontal">
