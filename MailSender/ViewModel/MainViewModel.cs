@@ -113,7 +113,7 @@ namespace MailSender.ViewModel
         private static readonly string AttachFile = $"Data\\AttachFile.pdf";
         private static readonly string SendersFile = $"Data\\Senders.info";
         private static readonly string MessageFile = $"Data\\Message.info";
-        private static readonly string LogFile = $"Data\\Log.info";
+        private static readonly string LogFile = $"Data\\Log.txt";
         private readonly string RecipientsFilePath = Path.Combine(CurrentDirectory, RecipientsFile);
         private readonly string SendersFilePath = Path.Combine(CurrentDirectory, SendersFile);
         private readonly string MessageFilePath = Path.Combine(CurrentDirectory, MessageFile);
@@ -204,8 +204,9 @@ namespace MailSender.ViewModel
 
                     using (StreamWriter sw = File.AppendText(LogFilePath))
                     {
-                        sw.WriteLine("Exception caught in CreateTimeoutTestMessage(): {0}",
-                            e.ToString());
+                        sw.WriteLine(
+                            "Exception caught in CreateTimeoutTestMessage(): {0}",$"{e.ToString()}, получатель {recipient.Address}, ID {recipient.Id}"
+                        );
                     }
                 }
                 catch (Exception exception)
