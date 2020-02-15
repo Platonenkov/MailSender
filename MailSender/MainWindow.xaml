@@ -44,14 +44,14 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <StackPanel Grid.Column="0" Grid.Row="0">
-                        <StackPanel Orientation="Horizontal"  Margin="5,2">
+                        <DockPanel Margin="5,2" HorizontalAlignment="Stretch">
                             <TextBlock >Поиск : </TextBlock>
-                            <TextBox Text="{Binding FindeString, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
+                            <TextBox Text="{Binding FindeString, UpdateSourceTrigger=PropertyChanged}" Margin="5,0"/>
+                        </DockPanel>
                         <StackPanel Orientation="Horizontal" Margin="5,2">
-                            <CheckBox Content="Поиск по имени" IsChecked="{Binding FindByName}"/>
-                            <CheckBox Content="Поиск по адресу" IsChecked="{Binding FindByAddress}"/>
-                            <CheckBox Content="Поиск по id" IsChecked="{Binding FindById}"/>
+                            <CheckBox Content="Поиск по имени" IsChecked="{Binding FindByName}" Margin="5,0"/>
+                            <CheckBox Content="Поиск по адресу" IsChecked="{Binding FindByAddress}" Margin="5,0"/>
+                            <CheckBox Content="Поиск по id" IsChecked="{Binding FindById}" Margin="5,0"/>
                         </StackPanel>
                     </StackPanel>
                     <DataGrid Grid.Row="1" Grid.Column="0" ItemsSource="{Binding FindeRec, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedRecipient}" IsReadOnly="True"
