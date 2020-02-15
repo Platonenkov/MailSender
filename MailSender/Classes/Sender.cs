@@ -11,17 +11,52 @@ namespace MailSender.Classes
     {
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        #region Name : string - ФИО
 
-        public string Address { get; set; }
+        /// <summary>ФИО</summary>
+        private string _Name;
 
-        public string SmtpServer { get; set; }
+        /// <summary>ФИО</summary>
+        public string Name { get => _Name; set => Set(ref _Name, value); }
 
-        public bool EnableSsl { get; set; }
+        #endregion
+        #region Address : string - Адрес почты
 
-        public int Port { get; set; }
+        /// <summary>Адрес почты</summary>
+        private string _Address;
 
+        /// <summary>Адрес почты</summary>
+        public string Address { get => _Address; set => Set(ref _Address, value); }
 
+        #endregion
+        #region SmtpServer : string - Smtp Server
+
+        /// <summary>Smtp Server</summary>
+        private string _SmtpServer;
+
+        /// <summary>Smtp Server</summary>
+        public string SmtpServer { get => _SmtpServer; set => Set(ref _SmtpServer, value); }
+
+        #endregion
+        #region EnableSsl : bool - вкл или нет SSL
+
+        /// <summary>вкл или нет SSL</summary>
+        private bool _EnableSsl;
+
+        /// <summary>вкл или нет SSL</summary>
+        public bool EnableSsl { get => _EnableSsl; set => Set(ref _EnableSsl, value); }
+
+        #endregion
+
+        #region Port : string - Порт
+
+        /// <summary>Порт</summary>
+        private int _Port;
+
+        /// <summary>Порт</summary>
+        public int Port { get => _Port; set => Set(ref _Port, value); }
+
+        #endregion
         #region Password : string - Пароль
 
         /// <summary>Пароль</summary>
@@ -52,6 +87,14 @@ namespace MailSender.Classes
             }
         }
 
-        public DateTime? FirstInDay { get; set; }
+        #region FirstInDay : DateTime? - Первый за день
+
+        /// <summary>Первый за день</summary>
+        private DateTime? _FirstInDay;
+
+        /// <summary>Первый за день</summary>
+        public DateTime? FirstInDay { get => _FirstInDay; set => Set(ref _FirstInDay, value); }
+
+        #endregion
     }
 }

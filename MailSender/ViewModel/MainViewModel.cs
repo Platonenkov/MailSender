@@ -14,11 +14,14 @@ using System.Xml.Xsl;
 using GalaSoft.MvvmLight;
 using MailSender.Classes;
 using MailSender.Command;
+using Notification.Wpf;
 
 namespace MailSender.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
+        static NotificationManager notificationManager = new NotificationManager();
+
         #region Title : string - Title window
 
         /// <summary>Title window</summary>
@@ -34,7 +37,15 @@ namespace MailSender.ViewModel
         private bool _IsSenderWork;
 
         /// <summary>Статус отправителя</summary>
-        public bool IsSenderWork { get => _IsSenderWork; set => Set(ref _IsSenderWork, value); }
+        public bool IsSenderWork
+        {
+            get => _IsSenderWork;
+            set
+            {
+                Set(ref _IsSenderWork, value);
+                notificationManager.Show(null, value ? "Sending was started" : "Sending was stoped", NotificationType.Information);
+            }
+        }
 
         #endregion
 
@@ -145,6 +156,7 @@ namespace MailSender.ViewModel
 
             foreach (var recipient in Recipients.Recipients.Where(r => r.WasSent == false))
             {
+                if(recipient.Address.IsNullOrWhiteSpace())continue;
                 if (SelectedSender.CountPer24Hours >= 500)
                 {
                     IsSenderWork = false;
@@ -178,13 +190,16 @@ namespace MailSender.ViewModel
             try
             {
                await smtp.SendMailAsync(msg).ConfigureAwait(true);
+               notificationManager.Show("Info", "Message was successfully send", NotificationType.Notification);
                return true;
             }
             catch (Exception e)
             {
                 try
                 {
-                    if(!File.Exists(LogFilePath)) using (var writer = new FileStream(LogFilePath, FileMode.Create)) { }
+                    notificationManager.Show("Error", $"{e.ToString()}", NotificationType.Error, null, TimeSpan.MaxValue);
+
+                    if (!File.Exists(LogFilePath)) using (var writer = new FileStream(LogFilePath, FileMode.Create)) { }
 
                     using (StreamWriter sw = File.AppendText(LogFilePath))
                     {
@@ -194,6 +209,8 @@ namespace MailSender.ViewModel
                 }
                 catch (Exception exception)
                 {
+                    notificationManager.Show("Error", $"{exception.ToString()}", NotificationType.Error, null, TimeSpan.MaxValue);
+
                 }
 
                 return false;
@@ -227,10 +244,19 @@ namespace MailSender.ViewModel
         {
             var data = recipient ?? SelectedRecipient;
             if (data is null) return;
-            if(Recipients.Recipients.Contains(data))return;
-            if(data.Name.IsNullOrWhiteSpace() && data.Address.IsNullOrWhiteSpace()) return;
+            if(Recipients.Recipients.Contains(data))
+            {
+                notificationManager.Show(null, "There is this recipient", NotificationType.Warning);
+                return;
+            }
+            if(data.Name.IsNullOrWhiteSpace() && data.Address.IsNullOrWhiteSpace())
+            {
+                notificationManager.Show(null, "You mast enter Name or Address", NotificationType.Warning);
+                return;
+            }
 
             Recipients.Add(data);
+            notificationManager.Show(null, "Successfully", NotificationType.Success);
 
         }
 
@@ -247,16 +273,27 @@ namespace MailSender.ViewModel
         {
             if(SelectedSender is null)return;
             Senders.Delete(SelectedSender);
+            notificationManager.Show(null, "Successfully", NotificationType.Success);
         }
 
         private void SaveSenderClick(Sender sender)
         {
             var data = sender ?? SelectedSender;
             if (data is null) return;
-            if(Senders.Senders.Contains(data))return;
-            if(data.Name.IsNullOrWhiteSpace()||data.Address.IsNullOrWhiteSpace()||data.SmtpServer.IsNullOrWhiteSpace()||data.Password.IsNullOrWhiteSpace())return;
+            if(Senders.Senders.Contains(data))
+            {
+                notificationManager.Show(null, "There is this sender", NotificationType.Warning);
+                return;
+            }
+            if (data.Name.IsNullOrWhiteSpace()||data.Address.IsNullOrWhiteSpace()||data.SmtpServer.IsNullOrWhiteSpace()||data.Password.IsNullOrWhiteSpace())
+            {
+                notificationManager.Show(null, "You mast enter Name, Address, Smtp server, password", NotificationType.Warning);
+                return;
+            }
 
             Senders.Add(data);
+            notificationManager.Show(null, "Successfully", NotificationType.Success);
+
         }
 
         private void AddNewSenderClick(object Obj)
@@ -339,9 +376,10 @@ namespace MailSender.ViewModel
             }
             catch (Exception e)
             {
+                notificationManager.Show("Error", e.ToString(), NotificationType.Error, null, TimeSpan.MaxValue);
+
                 return false;
             }
-
         }
 
         #endregion

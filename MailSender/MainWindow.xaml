@@ -11,7 +11,7 @@
         xmlns:converters="clr-namespace:MailSender.Converters"
         xmlns:htmlEditor="clr-namespace:Smith.WPF.HtmlEditor;assembly=Smith.WPF.HtmlEditor"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="600" Width="800"
+        Title="{Binding Title}" Height="650" Width="850"
         DataContext="{Binding Main,Source={StaticResource Locator}}"
         ResizeMode="CanResize"
         >
@@ -90,6 +90,9 @@
                                     <CheckBox IsChecked="{Binding WasSent, UpdateSourceTrigger=PropertyChanged}"/>
                                     <TextBlock Text="Отправлено" Margin="5,0"/>
                                 </StackPanel>
+                            </GroupBox>
+                            <GroupBox Header="Дата отправки">
+                                <TextBox Text="{Binding SendDateTime, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                             </GroupBox>
                         </StackPanel>
                         <StackPanel Grid.Row="1">
@@ -171,7 +174,7 @@
             </TabItem>
             <TabItem Header="Письмо">
                 <StackPanel>
-                    <htmlEditor:HtmlEditor BindingContent="{Binding MyHtmlProperty, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                    <htmlEditor:HtmlEditor BindingContent="{Binding MyHtmlProperty, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" MinHeight="400">
 
                     </htmlEditor:HtmlEditor>
                         <!--<xctk:RichTextBox  MinHeight="500" Text="{Binding TextMessage, UpdateSourceTrigger=PropertyChanged}">
