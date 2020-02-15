@@ -123,6 +123,7 @@ namespace MailSender.ViewModel
 
         public MainViewModel()
         {
+            Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
             MyHtmlProperty = String.Empty;
             
             Senders = new SendersList();
