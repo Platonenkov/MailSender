@@ -1,0 +1,18 @@
+﻿using System;
+using System.Runtime.InteropServices;
+
+namespace MailSender.Converters
+{
+    internal class IconWin32
+    {
+        public const uint SHGFI_ICON = 0x100;
+        public const uint SHGFI_LARGEICON = 0x0;    // 'Large icon
+        public const uint SHGFI_SMALLICON = 0x1;    // 'Small icon
+
+        [DllImport("shell32.dll")]
+        public static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref ApiFileInfo psfi, uint cbSizeFileInfo, uint uFlags);
+
+        [DllImport("user32")]
+        public static extern int DestroyIcon(IntPtr hIcon);
+    }
+}

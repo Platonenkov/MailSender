@@ -61,7 +61,9 @@
                             <DataGridTextColumn Header="Id" Width="50" Binding="{Binding Id, UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="Имя" MinWidth="50" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="Адрес" MinWidth="50" Binding="{Binding Address, UpdateSourceTrigger=PropertyChanged}"/>
-                            <DataGridTextColumn Header="Статус" MinWidth="50" Binding="{Binding WasSent, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Состояние" MinWidth="50" Binding="{Binding WasSent, UpdateSourceTrigger=PropertyChanged, 
+                                Converter={converters:BoolToStringSelectValueConverter True=Отправлено, False=Не_отправлено}}"/>
+                            <DataGridTextColumn Header="Статус" MinWidth="50" Binding="{Binding StatusSending, UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="Дата отправки" MinWidth="50" Binding="{Binding SendDateTime, UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="Проявлен интерес" MinWidth="50" Binding="{Binding InterestIsShown, UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="Телефон" MinWidth="50" Binding="{Binding Phone, UpdateSourceTrigger=PropertyChanged}"/>
@@ -77,7 +79,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <StackPanel Grid.Row="0">
+                        <StackPanel Grid.Row="0" IsEnabled="{Binding Main.SelectedRecipient, Source={StaticResource Locator}, Converter={converters:IsNotNull}}">
                             <GroupBox Header="ID">
                                 <TextBlock Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                             </GroupBox>
@@ -102,13 +104,15 @@
                             <GroupBox Header="Address">
                                 <TextBox Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                             </GroupBox>
-                            <GroupBox Header="Was sent">
-                                <TextBox Text="{Binding WasSent, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
+                            <GroupBox Header="Состояние">
+                                <CheckBox IsChecked="{Binding WasSent, UpdateSourceTrigger=PropertyChanged}" Content="{Binding WasSent, UpdateSourceTrigger=PropertyChanged,Converter={converters:BoolToStringSelectValueConverter True=Отправлено, False=Не_отправлено}}" VerticalAlignment="Top"/>
                             </GroupBox>
                             <GroupBox Header="Дата отправки">
                                 <TextBox Text="{Binding SendDateTime, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                             </GroupBox>
-
+                            <GroupBox Header="Статус">
+                                <TextBox Text="{Binding StatusSending, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
+                            </GroupBox>
                             <CheckBox Margin="5" Content="Проявлен интерес" IsChecked="{Binding InterestIsShown, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
@@ -167,7 +171,7 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <StackPanel Grid.Row="0" >
+                        <StackPanel Grid.Row="0" IsEnabled="{Binding Main.SelectedSender, Source={StaticResource Locator}, Converter={converters:IsNotNull}}">
                             <GroupBox Header="ID">
                                 <TextBlock Text="{Binding Id}" VerticalAlignment="Top"/>
                             </GroupBox>

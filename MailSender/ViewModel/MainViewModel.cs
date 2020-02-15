@@ -332,10 +332,11 @@ namespace MailSender.ViewModel
                if (result)
                {
                    recipient.WasSent = true;
+                   recipient.StatusSending = "Отправлено";
                    SelectedSender.CountPer24Hours += 1;
                }
-               
-               await Task.Delay(Pause).ConfigureAwait(true);
+
+                await Task.Delay(Pause).ConfigureAwait(true);
 
                if(!IsSenderWork)return;
             }
@@ -366,6 +367,8 @@ namespace MailSender.ViewModel
                 try
                 {
                     notificationManager.Show("Error", $"{e.ToString()}", NotificationType.Error, null, TimeSpan.MaxValue);
+
+                    recipient.StatusSending = "Ошибка отправки";
 
                     if (!File.Exists(LogFilePath)) using (var writer = new FileStream(LogFilePath, FileMode.Create)) { }
 

@@ -102,7 +102,26 @@ namespace MailSender.Classes
         private bool _interestIsShown;
 
         /// <summary>Проявлен интерес</summary>
-        public bool InterestIsShown { get => _interestIsShown; set => Set(ref _interestIsShown, value); }
+        public bool InterestIsShown
+        {
+            get => _interestIsShown;
+            set
+            {
+                Set(ref _interestIsShown, value);
+                if (value) StatusSending = "Проявлен интерес";
+                else StatusSending = string.Empty;
+            }
+        }
+
+        #endregion
+
+        #region StatusSending : string - статус отправки
+
+        /// <summary>статус отправки</summary>
+        private string _StatusSending;
+
+        /// <summary>статус отправки</summary>
+        public string StatusSending { get => _StatusSending; set => Set(ref _StatusSending, value); }
 
         #endregion
     }
