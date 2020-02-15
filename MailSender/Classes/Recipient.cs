@@ -95,5 +95,15 @@ namespace MailSender.Classes
         public DateTime? SendDateTime { get => _SendDateTime; set => Set(ref _SendDateTime, value); }
 
         #endregion
+
+        #region InterestIsShown : bool - Проявлен интерес
+
+        /// <summary>Проявлен интерес</summary>
+        private bool _interestIsShown;
+
+        /// <summary>Проявлен интерес</summary>
+        public bool InterestIsShown { get => _interestIsShown; set => Set(ref _interestIsShown, value); }
+
+        #endregion
     }
 }

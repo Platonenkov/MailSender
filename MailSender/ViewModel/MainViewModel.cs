@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -22,6 +23,67 @@ namespace MailSender.ViewModel
     public class MainViewModel : ViewModelBase
     {
         static NotificationManager notificationManager = new NotificationManager();
+
+        #region Поиск
+
+
+        private string _FindeString = string.Empty;
+        public string FindeString
+        {
+            get => _FindeString;
+            set
+            {
+                Set(ref _FindeString, value);
+                FindRecipients = new Recipient { Name = FindeString, Address = null };
+            }
+
+        }
+
+
+        /// <summary>
+        /// Поиск по списку получателей
+        /// </summary>
+        private Recipient _FindRecipients;
+        public Recipient FindRecipients
+        {
+            get => _FindRecipients;
+            set
+            {
+                Set(ref _FindRecipients, value);
+
+                var find = new ObservableCollection<Recipient>();
+                foreach (var recipient in Recipients.Recipients)
+                {
+                    if(recipient.Name.IsNotNullOrWhiteSpace())
+                    {
+                        if (Regular.FindString(FindeString.ToLower(), recipient.Name.ToLower()))
+                        {
+                            find.Add(recipient);
+                            continue;
+
+                        }
+                    }         
+                    if(recipient.Address.IsNotNullOrWhiteSpace())
+                        if (Regular.FindString(FindeString.ToLower(), recipient.Address.ToLower())) find.Add(recipient);
+
+
+                }
+                if (find.Count == 0 || FindeString == string.Empty) { FindeRec = Recipients.Recipients; }
+                else FindeRec = find;
+            }
+        }
+
+        private ObservableCollection<Recipient> _FindeRec;
+        public ObservableCollection<Recipient> FindeRec
+        {
+            get => _FindeRec;
+            set => Set(ref _FindeRec, value);
+
+        }
+
+
+        #endregion
+
 
         #region Title : string - Title window
 
@@ -66,7 +128,15 @@ namespace MailSender.ViewModel
         private RecipientsList _Recipients;
 
         /// <summary>Список получателей</summary>
-        public RecipientsList Recipients { get => _Recipients; set => Set(ref _Recipients, value); }
+        public RecipientsList Recipients
+        {
+            get => _Recipients;
+            set
+            {
+                Set(ref _Recipients, value);
+                FindeRec = value.Recipients;
+            }
+        }
 
         #endregion
 
@@ -165,9 +235,7 @@ namespace MailSender.ViewModel
             
             CheckWorkDirectoryOrCreate();
             CheckLogsOrMove();
-
             MyHtmlProperty = String.Empty;
-            
             Senders = new SendersList();
             Recipients = new RecipientsList();
             LoadRecipientsCommand = new LamdaCommand(LoadRecipientsFromFile, CanLoadRecipientsFile);

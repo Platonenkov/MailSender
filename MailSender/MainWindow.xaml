@@ -10,6 +10,7 @@
         xmlns:classes="clr-namespace:MailSender.Classes"
         xmlns:converters="clr-namespace:MailSender.Converters"
         xmlns:htmlEditor="clr-namespace:Smith.WPF.HtmlEditor;assembly=Smith.WPF.HtmlEditor"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
         Title="{Binding Title}" Height="650" Width="850"
         DataContext="{Binding Main,Source={StaticResource Locator}}"
@@ -38,7 +39,21 @@
                         <ColumnDefinition Width="2*"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <DataGrid ItemsSource="{Binding Recipients.Recipients, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedRecipient}" IsReadOnly="True"
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <StackPanel>
+                        <DockPanel  Margin="5,5" Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" Height="30">
+                            <TextBlock>Поиск : </TextBlock>
+                            <TextBox Text="{Binding FindeString, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <CheckBox Content="Поиск по имени"/>
+                            <CheckBox Content="Поиск по адресу"/>
+                        </DockPanel>
+                    </StackPanel>
+                    <DataGrid Grid.Row="1" Grid.Column="0" ItemsSource="{Binding FindeRec, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedRecipient}" IsReadOnly="True"
                               HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="CornflowerBlue" AutoGenerateColumns="False" 
                               HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
@@ -47,6 +62,7 @@
                             <DataGridTextColumn Header="Адрес" MinWidth="50" Binding="{Binding Address, UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="Статус" MinWidth="50" Binding="{Binding WasSent, UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="Дата отправки" MinWidth="50" Binding="{Binding SendDateTime, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn Header="Проявлен интерес" MinWidth="50" Binding="{Binding InterestIsShown, UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="Телефон" MinWidth="50" Binding="{Binding Phone, UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="Должность" MinWidth="50" Binding="{Binding Position, UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="Компания" MinWidth="50" Binding="{Binding Company, UpdateSourceTrigger=PropertyChanged}"/>
@@ -54,7 +70,7 @@
                             <DataGridTextColumn Header="INN" MinWidth="50" Binding="{Binding INN, UpdateSourceTrigger=PropertyChanged}"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Grid Grid.Column="1"  DataContext="{Binding SelectedRecipient, UpdateSourceTrigger=PropertyChanged}">
+                    <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"  DataContext="{Binding SelectedRecipient, UpdateSourceTrigger=PropertyChanged}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
@@ -91,11 +107,33 @@
                             <GroupBox Header="Дата отправки">
                                 <TextBox Text="{Binding SendDateTime, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                             </GroupBox>
+
+                            <CheckBox Margin="5" Content="Проявлен интерес" IsChecked="{Binding InterestIsShown, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                         </StackPanel>
-                        <StackPanel Grid.Row="1">
-                            <Button Content="Add new" Margin="10" Command="{Binding Main.AddNewRecipientCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
-                            <Button Content="Save"  Margin="10" Command="{Binding Main.SaveRecipientCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
-                            <Button Content="Delete"  Margin="10" Command="{Binding Main.DeleteRecipientCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <StackPanel.Resources>
+                                <Style TargetType="Button">
+                                    <Setter Property="Height" Value="30"/>
+                                    <Setter Property="Width" Value="30"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                </Style>
+                            </StackPanel.Resources>
+                            <Button Margin="10" Command="{Binding Main.AddNewRecipientCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}">
+                               <StackPanel Orientation="Horizontal">
+                                   <iconPacks:PackIconMaterial Kind="NewBox" Width="20" Height="20"  Foreground="Black" />
+                               </StackPanel> 
+                            </Button>
+                            <Button  Margin="10" Command="{Binding Main.SaveRecipientCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}">
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial Kind="ContentSave" Width="20" Height="20"  Foreground="DarkGreen" />
+                                </StackPanel>
+                            </Button>
+                            <Button  Margin="10" Command="{Binding Main.DeleteRecipientCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}">
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial Kind="Delete" Width="20" Height="20"  Foreground="DarkRed" />
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
                     </Grid>
                 </Grid>
@@ -161,14 +199,31 @@
                                 <TextBlock Text="{Binding TotalSent, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                             </GroupBox>
                         </StackPanel>
-                        <StackPanel Grid.Row="1">
-                            <StackPanel VerticalAlignment="Bottom">
-                                <Button Content="Add new" Margin="10" Command="{Binding Main.AddNewSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
-                                <Button Content="Save"  Margin="10" Command="{Binding Main.SaveSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
-                                <Button Content="Delete"  Margin="10" Command="{Binding Main.DeleteSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
-                            </StackPanel>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <StackPanel.Resources>
+                                <Style TargetType="Button">
+                                    <Setter Property="Height" Value="30"/>
+                                    <Setter Property="Width" Value="30"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                </Style>
+                            </StackPanel.Resources>
+                            <Button Margin="10" Command="{Binding Main.AddNewSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}">
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial Kind="NewBox" Width="20" Height="20"  Foreground="Black" />
+                                </StackPanel>
+                            </Button>
+                            <Button  Margin="10" Command="{Binding Main.SaveSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}">
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial Kind="ContentSave" Width="20" Height="20"  Foreground="DarkGreen" />
+                                </StackPanel>
+                            </Button>
+                            <Button  Margin="10" Command="{Binding Main.DeleteSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}">
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial Kind="Delete" Width="20" Height="20"  Foreground="DarkRed" />
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
-
                     </Grid>
                 </Grid>
             </TabItem>
