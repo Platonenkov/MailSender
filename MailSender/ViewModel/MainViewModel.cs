@@ -368,7 +368,7 @@ namespace MailSender.ViewModel
                 {
                     notificationManager.Show("Error", $"{e.ToString()}", NotificationType.Error, null, TimeSpan.MaxValue);
 
-                    recipient.StatusSending = "Ошибка отправки";
+                    recipient.StatusSending = "Ошибка отправки (спам)";
 
                     if (!File.Exists(LogFilePath)) using (var writer = new FileStream(LogFilePath, FileMode.Create)) { }
 
@@ -480,10 +480,26 @@ namespace MailSender.ViewModel
         private void SaveData(object Obj)
         {
             Senders.Save(SendersFilePath);
-            Recipients.Save(RecipientsFile);
+            //chekspam();
+            Recipients.Save(RecipientsFilePath);
             SaveMessage();
         }
 
+        //private void chekspam()
+        //{
+        //    var spam = new int[]
+        //    {
+        //        89,91,106,112,115,117,118,119,129,136,136,143,148,149,156,159,166,171,173,175,176,177,178,180,181,182,184,186,189,190,191,197,198,199,203,208,
+        //        210,211,212,221,226,227,228,229,234,236,237,238,239,240,247,249,250,262,264,265,267,268,271,272,273,274,278,279,283,286
+        //    };
+
+        //    foreach (var recipient in Recipients.Recipients)
+        //    {
+        //        if (recipient.Id <= 286 && recipient.Address.IsNotNullOrWhiteSpace() && !recipient.WasSent) recipient.WasSent = true;
+        //        if (spam.Contains(recipient.Id)) recipient.WasSent = false;
+        //    }
+
+        //}
         private void SaveMessage()
         {
             using (StreamWriter sw = new StreamWriter(MessageFilePath))

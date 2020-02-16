@@ -126,17 +126,17 @@
                             </StackPanel.Resources>
                             <Button Margin="10" Command="{Binding Main.AddNewRecipientCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}">
                                <StackPanel Orientation="Horizontal">
-                                   <iconPacks:PackIconMaterial Kind="NewBox" Width="20" Height="20"  Foreground="Black" />
+                                   <iconPacks:PackIconMaterial Kind="NewBox" Width="30" Height="30"  Foreground="Black" />
                                </StackPanel> 
                             </Button>
                             <Button  Margin="10" Command="{Binding Main.SaveRecipientCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}">
                                 <StackPanel Orientation="Horizontal">
-                                    <iconPacks:PackIconMaterial Kind="ContentSave" Width="20" Height="20"  Foreground="DarkGreen" />
+                                    <iconPacks:PackIconMaterial Kind="ContentSave" Width="30" Height="30"  Foreground="DarkGreen" />
                                 </StackPanel>
                             </Button>
                             <Button  Margin="10" Command="{Binding Main.DeleteRecipientCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}">
                                 <StackPanel Orientation="Horizontal">
-                                    <iconPacks:PackIconMaterial Kind="Delete" Width="20" Height="20"  Foreground="DarkRed" />
+                                    <iconPacks:PackIconMaterial Kind="Delete" Width="30" Height="30"  Foreground="DarkRed" />
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -215,17 +215,17 @@
                             </StackPanel.Resources>
                             <Button Margin="10" Command="{Binding Main.AddNewSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}">
                                 <StackPanel Orientation="Horizontal">
-                                    <iconPacks:PackIconMaterial Kind="NewBox" Width="20" Height="20"  Foreground="Black" />
+                                    <iconPacks:PackIconMaterial Kind="NewBox" Width="30" Height="30"  Foreground="Black" />
                                 </StackPanel>
                             </Button>
                             <Button  Margin="10" Command="{Binding Main.SaveSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}">
                                 <StackPanel Orientation="Horizontal">
-                                    <iconPacks:PackIconMaterial Kind="ContentSave" Width="20" Height="20"  Foreground="DarkGreen" />
+                                    <iconPacks:PackIconMaterial Kind="ContentSave" Width="30" Height="30"  Foreground="DarkGreen" />
                                 </StackPanel>
                             </Button>
                             <Button  Margin="10" Command="{Binding Main.DeleteSenderCommand, Source={StaticResource Locator}}" CommandParameter="{Binding}">
                                 <StackPanel Orientation="Horizontal">
-                                    <iconPacks:PackIconMaterial Kind="Delete" Width="20" Height="20"  Foreground="DarkRed" />
+                                    <iconPacks:PackIconMaterial Kind="Delete" Width="30" Height="30"  Foreground="DarkRed" />
                                 </StackPanel>
                             </Button>
                         </StackPanel>
