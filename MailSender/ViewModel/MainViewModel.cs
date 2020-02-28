@@ -55,62 +55,57 @@ namespace MailSender.ViewModel
         public bool FindById { get => _FindById; set => Set(ref _FindById, value); }
 
         #endregion
-        private string _FindeString = string.Empty;
-        public string FindeString
+        private string _FindString = string.Empty;
+        public string FindString
         {
-            get => _FindeString;
+            get => _FindString;
             set
             {
-                Set(ref _FindeString, value);
-                FindRecipients = new Recipient { Name = FindeString, Address = null };
+                Set(ref _FindString, value);
+                OnFindRowChanged();
             }
 
         }
 
+        private void OnFindRowChanged()
+        {
+            if (FindString.IsNullOrWhiteSpace())
+            { 
+                FindRecipients = Recipients.Recipients;
+                return;
+            }
 
-        /// <summary>
-        /// Поиск по списку получателей
-        /// </summary>
-        private Recipient _FindRecipients;
-        public Recipient FindRecipients
+            var find = new ObservableCollection<Recipient>();
+            foreach (var recipient in Recipients.Recipients)
+            {
+                if (FindByName && recipient.Name.IsNotNullOrWhiteSpace())
+                {
+                    if (Regular.FindString(FindString.ToLower(), recipient.Name.ToLower()))
+                    {
+                        find.Add(recipient);
+                        continue;
+
+                    }
+                }
+                if (FindByAddress && recipient.Address.IsNotNullOrWhiteSpace())
+                    if (Regular.FindString(FindString.ToLower(), recipient.Address.ToLower()))
+                    {
+                        find.Add(recipient);
+                        continue;
+
+                    }
+                if (FindById)
+                    if (Regular.FindString(FindString.ToLower(), recipient.Id.ToString())) find.Add(recipient);
+            }
+            if (find.Count == 0) { FindRecipients = new ObservableCollection<Recipient>(); }
+            else FindRecipients = find;
+
+        }
+        private ObservableCollection<Recipient> _FindRecipients;
+        public ObservableCollection<Recipient> FindRecipients
         {
             get => _FindRecipients;
-            set
-            {
-                Set(ref _FindRecipients, value);
-
-                var find = new ObservableCollection<Recipient>();
-                foreach (var recipient in Recipients.Recipients)
-                {
-                    if(FindByName && recipient.Name.IsNotNullOrWhiteSpace())
-                    {
-                        if (Regular.FindString(FindeString.ToLower(), recipient.Name.ToLower()))
-                        {
-                            find.Add(recipient);
-                            continue;
-
-                        }
-                    }         
-                    if(FindByAddress && recipient.Address.IsNotNullOrWhiteSpace())
-                        if (Regular.FindString(FindeString.ToLower(), recipient.Address.ToLower()))
-                        {
-                            find.Add(recipient);
-                            continue;
-
-                        }
-                    if (FindById)
-                        if (Regular.FindString(FindeString.ToLower(), recipient.Id.ToString())) find.Add(recipient);
-                }
-                if (find.Count == 0 || FindeString == string.Empty) { FindeRec = Recipients.Recipients; }
-                else FindeRec = find;
-            }
-        }
-
-        private ObservableCollection<Recipient> _FindeRec;
-        public ObservableCollection<Recipient> FindeRec
-        {
-            get => _FindeRec;
-            set => Set(ref _FindeRec, value);
+            set => Set(ref _FindRecipients, value);
 
         }
 
@@ -167,7 +162,7 @@ namespace MailSender.ViewModel
             set
             {
                 Set(ref _Recipients, value);
-                FindeRec = value.Recipients;
+                FindRecipients = value.Recipients;
             }
         }
 

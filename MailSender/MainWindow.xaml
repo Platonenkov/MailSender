@@ -46,7 +46,7 @@
                     <StackPanel Grid.Column="0" Grid.Row="0">
                         <DockPanel Margin="5,2" HorizontalAlignment="Stretch">
                             <TextBlock >Поиск : </TextBlock>
-                            <TextBox Text="{Binding FindeString, UpdateSourceTrigger=PropertyChanged}" Margin="5,0"/>
+                            <TextBox Text="{Binding FindString, UpdateSourceTrigger=PropertyChanged}" Margin="5,0"/>
                         </DockPanel>
                         <StackPanel Orientation="Horizontal" Margin="5,2">
                             <CheckBox Content="Поиск по имени" IsChecked="{Binding FindByName}" Margin="5,0"/>
@@ -54,7 +54,7 @@
                             <CheckBox Content="Поиск по id" IsChecked="{Binding FindById}" Margin="5,0"/>
                         </StackPanel>
                     </StackPanel>
-                    <DataGrid Grid.Row="1" Grid.Column="0" ItemsSource="{Binding FindeRec, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedRecipient}" IsReadOnly="True"
+                    <DataGrid Grid.Row="1" Grid.Column="0" ItemsSource="{Binding FindRecipients, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedRecipient}" IsReadOnly="True"
                               HorizontalGridLinesBrush="{x:Null}" AlternatingRowBackground="CornflowerBlue" AutoGenerateColumns="False" 
                               HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
