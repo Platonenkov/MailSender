@@ -97,8 +97,7 @@ namespace MailSender.ViewModel
                 if (FindById)
                     if (Regular.FindString(FindString.ToLower(), recipient.Id.ToString())) find.Add(recipient);
             }
-            if (find.Count == 0) { FindRecipients = new ObservableCollection<Recipient>(); }
-            else FindRecipients = find;
+            FindRecipients = find.Count == 0 ? new ObservableCollection<Recipient>() : find;
 
         }
         private ObservableCollection<Recipient> _FindRecipients;
